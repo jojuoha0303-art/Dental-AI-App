@@ -220,7 +220,7 @@ const App: React.FC = () => {
 
       <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
         <div className="max-w-6xl mx-auto px-4 text-center text-slate-500 text-sm">
-          <p>© 2024 SlideGen Pro (Powered by Gemini 3 Pro)</p>
+          <p>© 2026 prime-dentalnet </p>
         </div>
       </footer>
     </div>

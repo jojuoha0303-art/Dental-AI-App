@@ -10,7 +10,8 @@ import HygienistRecordGenerator from './components/HygienistRecordGenerator';
 import FlyerGenerator from './components/FlyerGenerator';
 import InstagramStoryGenerator from './components/InstagramStoryGenerator';
 import MeetingAgendaGenerator from './components/MeetingAgendaGenerator';
-import { Layers, Zap, FileText, Share2, MessageCircle, Stethoscope, Coffee, MapPin, Youtube, Image as ImageIcon, ClipboardList, Newspaper, Instagram, Users, Loader2 } from 'lucide-react';
+import Dashboard from './pages/Dashboard';
+import { Layers, Zap, FileText, Share2, MessageCircle, Stethoscope, Coffee, MapPin, Youtube, Image as ImageIcon, ClipboardList, Newspaper, Instagram, Users, Loader2, BarChart3 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -50,6 +51,20 @@ const App: React.FC = () => {
               </h1>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <button 
+                   onClick={() => handleModeSelect('DASHBOARD')}
+                   className="flex flex-col items-center p-8 bg-white border-2 border-slate-200 rounded-2xl hover:border-blue-600 hover:shadow-xl transition-all group"
+                 >
+                    <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
+                       <BarChart3 className="w-10 h-10 text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">経営分析ダッシュボード</h3>
+                    <p className="text-slate-500 text-sm text-center leading-relaxed">
+                       CSVデータをアップロードして、<br/>
+                       売上やKPIを可視化・分析
+                    </p>
+                 </button>
+
                  <button 
                    onClick={() => handleModeSelect('STAFF_BLOG')}
                    className="flex flex-col items-center p-8 bg-white border-2 border-slate-200 rounded-2xl hover:border-orange-500 hover:shadow-xl transition-all group"
@@ -179,6 +194,10 @@ const App: React.FC = () => {
            </div>
         ) : (
           <div className="w-full">
+            {generationMode === 'DASHBOARD' && (
+               <Dashboard onReset={handleReset} />
+            )}
+
             {generationMode === 'LINE' && (
                <LineGenerator mode="LINE" onGenerate={generateLineMessage} onReset={handleReset} />
             )}

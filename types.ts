@@ -1,5 +1,5 @@
 
-export type GenerationMode = 'LINE' | 'MEDICAL_RECORD' | 'STAFF_BLOG' | 'GOOGLE_MAP_REPLY' | 'YOUTUBE_CONTENT' | 'HYGIENIST_RECORD' | 'FLYER' | 'INSTAGRAM_STORY' | 'MEETING_AGENDA';
+export type GenerationMode = 'LINE' | 'MEDICAL_RECORD' | 'STAFF_BLOG' | 'GOOGLE_MAP_REPLY' | 'YOUTUBE_CONTENT' | 'HYGIENIST_RECORD' | 'FLYER' | 'INSTAGRAM_STORY' | 'MEETING_AGENDA' | 'DASHBOARD';
 
 // Staff Blog Specific Types
 export type StaffBlogStep = 'AUTHOR' | 'STYLE' | 'CONTENT' | 'IMAGES';

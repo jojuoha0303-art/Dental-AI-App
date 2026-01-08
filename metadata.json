@@ -1,5 +1,5 @@
 {
-  "name": "スタッフブログ作成アプリ",
+  "name": "歯科医院経営サポートアプリ",
   "description": "Upload a PDF paper and automatically generate professional infographic slides in Japanese using Gemini 3 Pro (Nano Banana Pro).",
   "requestFramePermissions": []
 }

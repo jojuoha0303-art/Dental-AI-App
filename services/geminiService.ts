@@ -19,13 +19,32 @@ import {
 } from "../types";
 
 /**
+ * Get API key from environment variables
+ * Works in both development (Vite) and production (Vercel)
+ */
+const getApiKey = (): string => {
+  // Try multiple sources for API key
+  const apiKey = 
+    (import.meta as any).env?.VITE_GEMINI_API_KEY || // Vite convention
+    (import.meta as any).env?.GEMINI_API_KEY ||       // Direct env var
+    (typeof process !== 'undefined' && process.env?.API_KEY) ||      // Vite config define
+    (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY); // Standard env var
+  
+  if (!apiKey) {
+    console.error('API key not found. Please set GEMINI_API_KEY or VITE_GEMINI_API_KEY in environment variables.');
+  }
+  
+  return apiKey || '';
+};
+
+/**
  * Ensures the user has selected a paid API key for Veo/Image capabilities
  */
 export const ensureApiKeySelected = async (): Promise<boolean> => {
-  if (window.aistudio && window.aistudio.hasSelectedApiKey) {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey && window.aistudio.openSelectKey) {
-      await window.aistudio.openSelectKey();
+  if ((window as any).aistudio && (window as any).aistudio.hasSelectedApiKey) {
+    const hasKey = await (window as any).aistudio.hasSelectedApiKey();
+    if (!hasKey && (window as any).aistudio.openSelectKey) {
+      await (window as any).aistudio.openSelectKey();
       return true; 
     }
     return hasKey;
@@ -36,7 +55,7 @@ export const ensureApiKeySelected = async (): Promise<boolean> => {
 // --- Line Generator Services ---
 
 export const generateLineMessage = async (input: LineInput): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   
   const prompt = `
     あなたは歯科医院のスタッフです。患者さんに送る LINE メッセージを作成してください。
@@ -91,7 +110,7 @@ export const generateLineMessage = async (input: LineInput): Promise<string> => 
 };
 
 export const generateLineInfographic = async (message: string, instruction?: string): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   
   let prompt = `
     Create a simple, friendly infographic summary image for a dental patient based on this message:
@@ -128,7 +147,7 @@ export const generateLineInfographic = async (message: string, instruction?: str
 // --- Staff Blog Specific Services ---
 
 export const createStaffBlogChat = async (): Promise<Chat> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const systemPrompt = `
 # 役割（ロール）
 
@@ -195,7 +214,7 @@ SEOに強い構成と、スタッフの「現場の生の声」を融合させ�
 };
 
 export const generateBlogFromPDF = async (pdfFile: InputFile): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `
 # 役割
 あなたは、歯科医院に勤務する明るく親しみやすいスタッフ（歯科衛生士または受付）です。
@@ -243,7 +262,7 @@ export const generateBlogFromPDF = async (pdfFile: InputFile): Promise<string> =
  * Creates a chat session for Hygienist Duty Record (SOPEN format).
  */
 export const createHygienistRecordChat = async (): Promise<Chat> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const systemPrompt = `
 # AIパートナー行動指針: 歯科診療録 SOPEN アシスタント (v3)
 
@@ -338,7 +357,7 @@ export const createHygienistRecordChat = async (): Promise<Chat> => {
 };
 
 export const generateBlogScenes = async (fullArticle: string): Promise<BlogSectionConfig[]> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `
     Analyze the following blog post.
     Identify the Main Title (H1) and all Major Headings (H2).
@@ -389,7 +408,7 @@ export const generateBlogScenes = async (fullArticle: string): Promise<BlogSecti
 };
 
 export const regenerateBlogScene = async (header: string, currentScene: string): Promise<{sceneDescription: string, caption: string}> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `
     Suggest a DIFFERENT visual scene and caption for the blog section titled: "${header}".
     Current idea was: "${currentScene}".
@@ -426,7 +445,7 @@ export const generateBlogImage = async (
   modificationInstruction?: string,
   aspectRatio: '16:9' | '1:1' | '3:4' = '16:9'
 ): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   let stylePrompt = "";
   switch (style) {
@@ -513,7 +532,7 @@ export const generateFreeformImage = async (
   authorImageBase64: string | null,
   aspectRatio: '16:9' | '1:1' | '3:4' = '16:9'
 ): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   let stylePrompt = "";
   switch (style) {
@@ -593,7 +612,7 @@ export const generateBlogEyecatch = async (
   mood: string = 'Clean',
   colorScheme: string = 'Blue and White'
 ): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   
   // Summarize atmosphere
   const summaryPrompt = `
@@ -680,7 +699,7 @@ export const generateBlogEyecatch = async (
  * Generates a Medical Record (SOAP) based on conversation transcription.
  */
 export const generateMedicalRecord = async (input: LineInput): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   const systemPrompt = `
 # 役割
@@ -775,7 +794,7 @@ ${input.additionalInfo}
  * Generates a Staff Blog post based on topic and images.
  */
 export const generateStaffBlog = async (input: LineInput): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const systemPrompt = `
 # 役割
 あなたは、歯科医院に勤務する明るく親しみやすいスタッフ（歯科衛生士または受付）です。
@@ -817,7 +836,7 @@ export const generateStaffBlog = async (input: LineInput): Promise<string> => {
  * Generates a Reply to a Google Map Review.
  */
 export const generateGoogleMapReply = async (reviewerName: string, reviewContent: string, additionalContext?: string): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   const systemPrompt = `
 Googleマップの口コミに対して、適切な返信を行うボットです。
@@ -880,7 +899,7 @@ ${additionalContext ? `
  * Creates a chat session for Meeting Agenda generation.
  */
 export const createMeetingAgendaChat = async (): Promise<Chat> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const systemPrompt = `
 あなたは、歯科医院の経営をサポートする「敏腕ファシリテーター」です。
 スタッフから集まった雑多な意見や議題の種（トピックス）を整理し、限られた時間で成果を出すための「効果的なミーティング議案（アジェンダ）」を作成してください。
@@ -923,7 +942,7 @@ export const createMeetingAgendaChat = async (): Promise<Chat> => {
  * Generates YouTube Chapters, Summary, and Hashtags from transcription text.
  */
 export const generateYoutubeChapter = async (transcriptionText: string): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   const systemPrompt = `
 # 命令書
@@ -1003,7 +1022,7 @@ export const generateYoutubeThumbnail = async (
   composition: ThumbnailComposition,
   colorScheme: ThumbnailColorScheme
 ): Promise<string[]> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
 
   // Define composition instruction based on presence of performer image
   let performerInstruction = "";
@@ -1104,7 +1123,7 @@ export const generateYoutubeThumbnail = async (
 };
 
 export const modifyYoutubeThumbnail = async (currentImageBase64: string, instruction: string): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `
     Edit the provided YouTube thumbnail image based on the following instruction:
     "${instruction}"
@@ -1154,7 +1173,7 @@ export const generateSeminarBanner = async (
   bodyText: string,
   aspectRatio: "16:9" | "1:1"
 ): Promise<string[]> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const basePrompt = `
     Create a professional seminar/event banner image.
     
@@ -1211,7 +1230,7 @@ export const generateSeminarBanner = async (
 };
 
 export const modifySeminarBanner = async (currentImageBase64: string, instruction: string, aspectRatio: "16:9" | "1:1"): Promise<string> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `Edit this banner: ${instruction}`;
   const parts: any[] = [
       { inlineData: { mimeType: 'image/png', data: currentImageBase64 } },
@@ -1246,7 +1265,7 @@ export const generateFlyer = async (
   mood: FlyerMood,
   colorScheme: FlyerColorScheme
 ): Promise<string[]> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   
   const prompt = `
     Create a professional Flyer/Poster design.
@@ -1302,7 +1321,7 @@ export const generateInstagramStory = async (
     message: string,
     note: string
 ): Promise<string[]> => {
-  const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const client = new GoogleGenAI({ apiKey: getApiKey() });
   const prompt = `
     Create an engaging Instagram Story image.
     
